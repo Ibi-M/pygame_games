@@ -1,15 +1,13 @@
-import pygame 
+import pygame
 import math
 import random
-from colorama import *
-init(autoreset=True)
 
-pygame.init() 
-  
+pygame.init()
+
 # Creating the Window
-WIDTH,HEIGHT = 800,480
-screen = pygame.display.set_mode((WIDTH,HEIGHT)) 
-bg = pygame.image.load('pygame_games/hangman/bg.jpg')
+WIDTH, HEIGHT = 800, 480
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+bg = pygame.image.load('bg.jpg')
 pygame.display.set_caption("Hangman")
 
 # Fonts
@@ -20,20 +18,20 @@ WIN_FONT = pygame.font.SysFont('sansserif', 100)
 LOSE_FONT = pygame.font.SysFont('sansserif', 80)
 
 # Sound Effects
-win_se = pygame.mixer.Sound('hangman/win.wav')
-lose_se = pygame.mixer.Sound('hangman/lose.wav')
-right_se = pygame.mixer.Sound('hangman/right.wav')
-wrong_se = pygame.mixer.Sound('hangman/wrong.wav')
+win_se = pygame.mixer.Sound('win.wav')
+lose_se = pygame.mixer.Sound('lose.wav')
+right_se = pygame.mixer.Sound('right.wav')
+wrong_se = pygame.mixer.Sound('wrong.wav')
 
 # BG Music
-pygame.mixer.music.load('hangman/bg.mp3')
-pygame.mixer.music.play(-1,0.0)
+pygame.mixer.music.load('bg.mp3')
+pygame.mixer.music.play(-1, 0.0)
 pygame.mixer.music.set_volume(.1)
 
 #Load Images
 images = []
 for i in range(7):
-    image = pygame.image.load("hangman/hangman" + str(i) + ".png")
+    image = pygame.image.load("hangman" + str(i) + ".png")
     images.append(image)
 
 # Button variables
@@ -45,14 +43,16 @@ starty = 400
 A = 65
 for i in range(26):
     x = startx + GAP * 2 + ((RADIUS * 2 + GAP) * (i % 13))
-    y = starty + ((i//13) * (GAP + RADIUS * 2))
-    letters.append([x , y, chr(A + i), True])
+    y = starty + ((i // 13) * (GAP + RADIUS * 2))
+    letters.append([x, y, chr(A + i), True])
+
 
 # Load Words
 def load_words():
-    with open("hangman/words.txt", "r") as file: 
-        words = file.read().splitlines()  
+    with open("words.txt", "r") as file:
+        words = file.read().splitlines()
     return words
+
 
 #Main Game Variables
 hangman_status = 0
@@ -61,19 +61,20 @@ word = random.choice(words)
 guessed = []
 
 #Colors
-WHITE = (255,255,255)
-BLACK = (0,0,0)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 print(images)
 
+
 def draw():
     global bg
-    screen.blit(bg,(0,0))
+    screen.blit(bg, (0, 0))
 
     # Draw Title
     TITLE_FONT.set_underline(True)
     text = TITLE_FONT.render("HANGMAN", True, BLACK)
-    screen.blit(text, (WIDTH/2 - text.get_width()/2, 10))
+    screen.blit(text, (WIDTH / 2 - text.get_width() / 2, 10))
     TITLE_FONT.set_underline(False)
 
     # Draw Word
@@ -85,16 +86,17 @@ def draw():
             display_word += "_ "
     text = WORD_FONT.render(display_word, 1, BLACK)
     screen.blit(text, (350, 200))
-    
+
     #Draw Buttons
     for letter in letters:
-        x,y, ltr, visible = letter
+        x, y, ltr, visible = letter
         if visible:
-            pygame.draw.circle(screen,BLACK, (x,y), RADIUS, 3)
+            pygame.draw.circle(screen, BLACK, (x, y), RADIUS, 3)
             text = LETTER_FONT.render(ltr, 1, BLACK)
-            screen.blit(text, (x - text.get_width()/2, y - text.get_height()/2))
+            screen.blit(text,
+                        (x - text.get_width() / 2, y - text.get_height() / 2))
 
-    screen.blit(images[hangman_status],(50,100))
+    screen.blit(images[hangman_status], (50, 100))
     pygame.display.update()
 
 
@@ -105,14 +107,18 @@ def display_message(message):
     text2 = LOSE_FONT.render(f"The word was {word}", 1, BLACK)
     if hangman_status == 6:
         lose_se.play()
-        screen.blit(text1, (WIDTH/2 - text1.get_width()/2, HEIGHT/6 - text1.get_height()))
-        screen.blit(text2, (WIDTH/2 - text2.get_width()/2, HEIGHT/2 - text2.get_height()))
+        screen.blit(text1, (WIDTH / 2 - text1.get_width() / 2,
+                            HEIGHT / 6 - text1.get_height()))
+        screen.blit(text2, (WIDTH / 2 - text2.get_width() / 2,
+                            HEIGHT / 2 - text2.get_height()))
     elif won:
         win_se.play()
-        screen.blit(text1, (WIDTH/2 - text1.get_width()/2, HEIGHT/2 - text1.get_height()))
+        screen.blit(text1, (WIDTH / 2 - text1.get_width() / 2,
+                            HEIGHT / 2 - text1.get_height()))
     pygame.display.update()
     pygame.time.delay(3000)
-    
+
+
 def main():
     global hangman_status
     FPS = 60
@@ -131,20 +137,20 @@ def main():
                     if visible:
                         dis = math.sqrt((x - m_x)**2 + (y - m_y)**2)
                         if dis < RADIUS:
-                            letter[3] = False    
-                            guessed.append(ltr)  
+                            letter[3] = False
+                            guessed.append(ltr)
                             if ltr not in word:
                                 wrong_se.play()
-                                hangman_status += 1   
+                                hangman_status += 1
                             else:
-                                right_se.play() 
-        draw()                        
+                                right_se.play()
+        draw()
         global won
         won = True
         for letter in word:
             if letter not in guessed:
                 won = False
-                break     
+                break
 
         if won:
             pygame.mixer.music.stop()
@@ -155,6 +161,8 @@ def main():
             pygame.mixer.music.stop()
             display_message("You LOST!")
             break
+
+
 while True:
     main()
     pygame.quit()
