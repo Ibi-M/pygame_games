@@ -5,7 +5,7 @@ import random
 pygame.init()
 
 # Creating the Window
-WIDTH, HEIGHT = 800, 480
+WIDTH, HEIGHT = 800, 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 bg = pygame.image.load('bg.jpg')
 pygame.display.set_caption("Hangman")
@@ -91,8 +91,8 @@ def draw():
     for letter in letters:
         x, y, ltr, visible = letter
         if visible:
-            pygame.draw.circle(screen, BLACK, (x, y), RADIUS, 3)
-            text = LETTER_FONT.render(ltr, 1, BLACK)
+            pygame.draw.circle(screen, WHITE, (x, y), RADIUS, 3)
+            text = LETTER_FONT.render(ltr, 1, WHITE)
             screen.blit(text,
                         (x - text.get_width() / 2, y - text.get_height() / 2))
 
