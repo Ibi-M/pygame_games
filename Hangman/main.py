@@ -186,32 +186,37 @@ def draw():
 def display_message(message, result, color):
     pygame.time.delay(2000)
     screen.blit(bg, (0, 0))
-    pygame.draw.rect(screen, BLACK, (150, 15, 500, 100))
-    pygame.draw.rect(screen, YELLOW, (150, 15, 500, 100), 5)
 
-    pygame.draw.rect(screen, BLACK, (10, 175, 780, 100))
-    pygame.draw.rect(screen, YELLOW, (10, 175, 780, 100), 5)
     WIN_FONT.set_underline(True)
     text1 = WIN_FONT.render(message, 1, color)
     WIN_FONT.set_underline(False)
     text2 = LOSE_FONT.render(f"The word was {word}", 1, RED)
     if hangman_status == 6:
+        pygame.draw.rect(screen, BLACK, (150, 15, 500, 100))
+        pygame.draw.rect(screen, YELLOW, (150, 15, 500, 100), 5)
+        pygame.draw.rect(screen, BLACK, (10, 175, 780, 100))
+        pygame.draw.rect(screen, YELLOW, (10, 175, 780, 100), 5)
         lose_se.play()
         screen.blit(text1, (WIDTH / 2 - text1.get_width() / 2,
                             HEIGHT / 5 - text1.get_height()))
         screen.blit(text2, (WIDTH / 2 - text2.get_width() / 2,
                             HEIGHT / 2 - text2.get_height()))
     elif won:
+        pygame.draw.rect(screen, BLACK, (150, 130, 500, 100))
+        pygame.draw.rect(screen, YELLOW, (150, 130, 500, 100), 5)
         win_se.play()
-        screen.blit(text1, (WIDTH / 2 - text1.get_width() / 2,
-                            HEIGHT / 2 - text1.get_height()))
+        screen.blit(text1, (220,145))
 
-    pygame.draw.rect(screen, BLUE, (225, 350, 350, 100))
-    pygame.draw.rect(screen, BLACK, (225, 350, 350, 100), 5)
-    button = pygame.Rect(225, 350, 350, 100)
+    if won:
+        y_c = 275
+    else:
+        y_c = 350
+    pygame.draw.rect(screen, BLUE, (225, y_c, 350, 100))
+    pygame.draw.rect(screen, BLACK, (225, y_c, 350, 100), 5)
+    button = pygame.Rect(225, y_c, 350, 100)
     TITLE_FONT.set_underline(True)
     again = TITLE_FONT.render("Play Again", 1, WHITE)
-    screen.blit(again, (275, 370))
+    screen.blit(again, (275, y_c + 20))
     TITLE_FONT.set_underline(False)
     pygame.display.update()
     
@@ -254,6 +259,7 @@ def main():
                                 hangman_status += 1
                             else:
                                 right_se.play()
+        
         draw()
         global won
         won = True
