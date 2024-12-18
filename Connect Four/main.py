@@ -3,14 +3,15 @@ import pygame
 pygame.init()
 
 # Create Window
-WIDTH, HEIGHT = 700, 700
+WIDTH, HEIGHT = 800, 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-bg = pygame.image.load('bg2.jpg')
-grid = pygame.image.load('grid.png')
+bg = pygame.image.load('Game Centre/Connect 4/bg2.jpg')
+grid = pygame.image.load('Game Centre/Connect 4/grid.png')
 
 # Fonts and Colours
 TITLE_FONT = pygame.font.SysFont('Raleway', 70)
-LABEL_FONT = pygame.font.SysFont('comicsans', 60)
+LABEL_FONT = pygame.font.SysFont('comicsans', 50)
+STATUS_FONT = pygame.font.SysFont('Raleway', 50)
 INSTRUCTIONS_FONT = pygame.font.SysFont('sansserif', 30)
 WIN_FONT = pygame.font.SysFont('comicsans', 70, bold=True)
 BLACK = (0, 0, 0)
@@ -23,8 +24,8 @@ COLORS = [RED, YELLOW]
 NUM_ROWS = 6
 NUM_COLUMNS = 7
 player = 0
-x_positions = [155, 220, 285, 350, 415, 480, 545]
-y_positions = [244, 305, 366, 427, 488, 549]
+x_positions = [225, 283, 342, 400, 459, 517, 575]
+y_positions = [180, 235, 290, 345, 400, 455]
 positions = []
 taken = []
 
@@ -49,49 +50,94 @@ def draw(won):
 
     # Display Title
     TITLE_FONT.set_underline(True)
-    title_text = TITLE_FONT.render("Connect 4", True, BLACK)
-    screen.blit(title_text, (WIDTH / 2 - title_text.get_width() / 2, 30))
+    title_text = TITLE_FONT.render("Connect 4", True, (200,150,100))
+    screen.blit(title_text, (WIDTH / 2 - title_text.get_width() / 2, 10))
     TITLE_FONT.set_underline(False)
 
     # Display Instrunctions
     instructions = INSTRUCTIONS_FONT.render(
-        "Press 1-7 to drop your piece in a column", True, BLACK)
-    screen.blit(instructions, (WIDTH / 2 - instructions.get_width() / 2, 100))
+        "Press 1-7 to drop your piece in a column", True, (200,150,150))
+    screen.blit(instructions, (WIDTH / 2 - instructions.get_width() / 2, 70))
 
     # Display Column Labels
     for i in range(7):
-        label = LABEL_FONT.render(str(i + 1), True, BLACK)
-        screen.blit(label, (x_positions[i] - label.get_width() // 2, 160))
+        label = LABEL_FONT.render(str(i + 1), True, (255,255,0))
+        screen.blit(label, (x_positions[i] - label.get_width() // 2, 80))
 
     # Display Grid
-    screen.blit(grid, (100, 200))
+    screen.blit(grid, (175, 140))
 
     # Draws Circles where spaces have been chosen/occupied
     for row in range(NUM_ROWS):
         for col in range(NUM_COLUMNS):
             if taken[row][col]:
                 color = COLORS[taken[row][col] - 1]
-                pygame.draw.circle(screen, color, positions[row][col], 24)
+                pygame.draw.circle(screen, color, positions[row][col], 21)
 
     # Check if any player has won
     if not won:
-        turn = TITLE_FONT.render("Player " + str(player + 1) + "'s Turn", True,
-                                 COLORS[player])
-        screen.blit(turn, (170, 600))
+        players = ["RED'S", "YELLOW'S"]
+        turn_text = players[player]  
+        turn_action = "TURN"         
+
+        if player == 0:
+            x_pos = 40  
+        else:
+            x_pos = 625  
+
+        y_start = 240  
+        line_spacing = 35  
+
+        player_render = STATUS_FONT.render(turn_text, True, COLORS[player])
+        screen.blit(player_render, (x_pos, y_start))
+        
+        turn_render = STATUS_FONT.render(turn_action, True, COLORS[player])
+        turn_x_pos = x_pos + (player_render.get_width() // 2) - (turn_render.get_width() // 2)  # Center "TURN"
+        screen.blit(turn_render, (turn_x_pos, y_start + line_spacing))
+
     elif won:
-        WIN_FONT.set_underline(True)
-        final = WIN_FONT.render(f"Player {player + 1} WINS!", True,
-                                COLORS[player])
-        screen.blit(final, (WIDTH / 2 - final.get_width() / 2, 630))
+        players = ["RED'S", "YELLOW'S"]
+        winner_text = players[player]
+        win_action = "WINS!"
+
+        if player == 0:
+            x_pos = 40
+        else:
+            x_pos = 625
+
+        y_start = 240
+        line_spacing = 35
+
+        STATUS_FONT.set_bold(True)
+        STATUS_FONT.set_underline(True)
+
+        winner_render = STATUS_FONT.render(winner_text, True, COLORS[player])
+        screen.blit(winner_render, (x_pos, y_start))
+
+        win_render = STATUS_FONT.render(win_action, True, COLORS[player])
+
+        winner_width = winner_render.get_width()
+        win_width = win_render.get_width()
+
+        win_x_pos = x_pos + (winner_width // 2) - (win_width // 2)
+
+        screen.blit(win_render, (win_x_pos, y_start + line_spacing))
+
+        STATUS_FONT.set_bold(False)
+        STATUS_FONT.set_underline(False)
+
         pygame.display.update()
         pygame.time.delay(5000)
         pygame.quit()
+
+
     pygame.display.update()
+
+
 
 
 # Checks all winning conditions
 def win(p):
-
     # Checks the horizontal winning
     for r in range(6):
         for c in range(4):
@@ -102,7 +148,7 @@ def win(p):
     # Checks the vertical winning
     for c in range(7):
         for r in range(3):
-            if taken[r][c] == p and taken[r + 1][c] == p and taken[
+            if taken[r][c] == p and taken[r + 1][c] == p and taken[ 
                     r + 2][c] == p and taken[r + 3][c] == p:
                 return True
 
@@ -124,20 +170,20 @@ def win(p):
 
 # Main Game Loop
 def main():
-    global player
+    global player, won
     screen.fill((255, 200, 20))
     FPS = 60
     clock = pygame.time.Clock()
     run = True
 
     while run:
-        global won
         clock.tick(FPS)
         draw(won)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
                 
             if event.type == pygame.KEYDOWN:
                 valid_numbers = [
@@ -158,9 +204,9 @@ def main():
                     if win(player + 1):
                         print(f"Player {player + 1} WINS!")
                         won = True
-                        return won
-                    player = 1 - player
+                        return  # Exit the game after a win
+                    player = 1 - player  # Switch player
 
-
+# Start the game loop
 while True:
     main()

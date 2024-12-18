@@ -9,12 +9,12 @@ pygame.init()
 # Creating the Window
 WIDTH, HEIGHT = 800, 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-bg = pygame.image.load('bg.jpg')
-menu_bg = pygame.image.load('menu.jpg')
-country = pygame.image.load('countries.png')
-animals = pygame.image.load('animals.png')
-food = pygame.image.load('food.png')
-other = pygame.image.load('random.png')
+bg = pygame.image.load('game centre/hangman/bg.jpg')
+menu_bg = pygame.image.load('game centre/hangman/menu.jpg')
+country = pygame.image.load('game centre/hangman/countries.png')
+animals = pygame.image.load('game centre/hangman/animals.png')
+food = pygame.image.load('game centre/hangman/food.png')
+other = pygame.image.load('game centre/hangman/random.png')
 pygame.display.set_caption("Hangman")
 state = ""
 
@@ -34,20 +34,20 @@ GRAY = (128, 128, 128)
 BLUE = (0, 0, 255)
 
 # Sound Effects
-win_se = pygame.mixer.Sound('win.wav')
-lose_se = pygame.mixer.Sound('lose.wav')
-right_se = pygame.mixer.Sound('right.wav')
-wrong_se = pygame.mixer.Sound('wrong.wav')
+win_se = pygame.mixer.Sound('game centre/hangman/win.wav')
+lose_se = pygame.mixer.Sound('game centre/hangman/lose.wav')
+right_se = pygame.mixer.Sound('game centre/hangman/right.wav')
+wrong_se = pygame.mixer.Sound('game centre/hangman/wrong.wav')
 
 # BG Music
-pygame.mixer.music.load('bg.mp3')
+pygame.mixer.music.load('game centre/hangman/bg.mp3')
 pygame.mixer.music.play(-1, 0.0)
 pygame.mixer.music.set_volume(.1)
 
-#Load Images
+# Load Images
 images = []
 for i in range(7):
-    image = pygame.image.load("hangman" + str(i) + ".png")
+    image = pygame.image.load("game centre/hangman/hangman" + str(i) + ".png")
     images.append(image)
 
 # Button variables
@@ -62,13 +62,9 @@ for i in range(26):
     y = starty + ((i // 13) * (GAP + RADIUS * 2))
     letters.append([x, y, chr(A + i), True])
 
-#Main Game Variables
+# Game Variables
 hangman_status = 0
-
 guessed = []
-
-print(images)
-
 
 def menu():
     screen.blit(menu_bg, (0, 0))
@@ -139,16 +135,22 @@ def menu():
                 for i in range(4):
                     rect = rectangles[i]
                     if rect.collidepoint(x, y):
-                        with open(type[i] + ".txt", "r") as file:
+                        with open('game centre/hangman/'+ type[i] + ".txt", "r") as file:
                             words = file.read().splitlines()
                         running = False
                         break
     return words
 
-
-words = menu()
-word = random.choice(words)
-
+def reset_game():
+    global hangman_status, guessed, word, letters
+    hangman_status = 0
+    guessed = []
+    word = random.choice(menu())  # Choose a new word
+    for letter in letters:
+        letter[3] = True  # Make all the letter buttons visible again
+    pygame.mixer.music.play(-1, 0.0)  # Restart the music
+    print("Game reset and music restarted")
+    main()
 
 def draw():
     global bg
@@ -182,7 +184,6 @@ def draw():
     screen.blit(images[hangman_status], (50, 100))
     pygame.display.update()
 
-
 def display_message(message, result, color):
     pygame.time.delay(2000)
     screen.blit(bg, (0, 0))
@@ -205,7 +206,7 @@ def display_message(message, result, color):
         pygame.draw.rect(screen, BLACK, (150, 130, 500, 100))
         pygame.draw.rect(screen, YELLOW, (150, 130, 500, 100), 5)
         win_se.play()
-        screen.blit(text1, (220,145))
+        screen.blit(text1, (220, 145))
 
     if won:
         y_c = 275
@@ -219,7 +220,7 @@ def display_message(message, result, color):
     screen.blit(again, (275, y_c + 20))
     TITLE_FONT.set_underline(False)
     pygame.display.update()
-    
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -228,17 +229,15 @@ def display_message(message, result, color):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()
                 if button.collidepoint(x, y):
-                    pygame.quit()
-                    os.execl(sys.executable, sys.executable, *sys.argv)
-                else:
-                    pygame.quit()
-                    quit()
+                    reset_game()  # Reset the game instead of quitting
+                    return  # Exit the message function and continue the game loop
 
 def main():
-    global hangman_status
+    global hangman_status, won, word
     FPS = 60
     clock = pygame.time.Clock()
     run = True
+    word = random.choice(menu())  # Choose a word from the menu
     while run:
         clock.tick(FPS)
         draw()
@@ -259,9 +258,23 @@ def main():
                                 hangman_status += 1
                             else:
                                 right_se.play()
-        
+            if event.type == pygame.KEYDOWN:
+                allowed = [
+                    pygame.K_a, pygame.K_b, pygame.K_c, pygame.K_d, pygame.K_e,
+                    pygame.K_f, pygame.K_g, pygame.K_h, pygame.K_i, pygame.K_j,
+                    pygame.K_k, pygame.K_l, pygame.K_m, pygame.K_n, pygame.K_o,
+                    pygame.K_p, pygame.K_q, pygame.K_r, pygame.K_s, pygame.K_t,
+                    pygame.K_u, pygame.K_v, pygame.K_w, pygame.K_x, pygame.K_y,
+                    pygame.K_z
+                ]
+                for letter in letters:
+                    x, y, ltr, visible = letter
+                    if visible:
+                        if letter == event.key:
+                            letter[3] = False
+                            guessed.append(ltr)
+
         draw()
-        global won
         won = True
         for letter in word:
             if letter not in guessed:
@@ -278,7 +291,5 @@ def main():
             display_message("You LOST!", "lost", RED)
             break
 
-
 if __name__ == "__main__":
     main()
-    
