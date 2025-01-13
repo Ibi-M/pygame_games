@@ -1,8 +1,7 @@
 import pygame
 import math
 import random
-import sys
-import os
+from subprocess import call
 
 pygame.init()
 
@@ -25,6 +24,7 @@ WORD_FONT = pygame.font.SysFont('comicsans', 50)
 TITLE_FONT = pygame.font.SysFont('sansserif', 70)
 WIN_FONT = pygame.font.SysFont('sansserif', 100)
 LOSE_FONT = pygame.font.SysFont('sansserif', 80)
+MESSAGE_FONT = pygame.font.SysFont('sansserif', 60)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -218,13 +218,23 @@ def display_message(message, result, color):
         y_c = 275
     else:
         y_c = 350
-    pygame.draw.rect(screen, BLUE, (225, y_c, 350, 100))
-    pygame.draw.rect(screen, BLACK, (225, y_c, 350, 100), 5)
-    button = pygame.Rect(225, y_c, 350, 100)
+    pygame.draw.rect(screen, BLUE, (50, y_c, 300, 100))
+    pygame.draw.rect(screen, BLACK, (50, y_c, 300, 100), 5)
+    play_again = pygame.Rect(50, y_c, 300, 100)
     TITLE_FONT.set_underline(True)
     again = TITLE_FONT.render("Play Again", 1, WHITE)
-    screen.blit(again, (275, y_c + 20))
+    screen.blit(again, (80, y_c + 20))
     TITLE_FONT.set_underline(False)
+
+    pygame.draw.rect(screen, BLUE, (450, y_c, 300, 100))
+    pygame.draw.rect(screen, BLACK, (450, y_c, 300, 100), 5)
+    main_menu = pygame.Rect(450, y_c, 300, 100)
+    MESSAGE_FONT.set_underline(True)
+    again1 = MESSAGE_FONT.render("Return to", 1, WHITE)
+    again2 = MESSAGE_FONT.render("Main Menu", 1, WHITE)
+    screen.blit(again1, (500, y_c + 10))
+    screen.blit(again2, (490, y_c + 50))
+    MESSAGE_FONT.set_underline(False)
     pygame.display.update()
 
     running = True
@@ -234,8 +244,12 @@ def display_message(message, result, color):
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()
-                if button.collidepoint(x, y):
+                if play_again.collidepoint(x, y):
                     reset_game()  # Reset the game instead of quitting
+                elif main_menu.collidepoint(x, y):
+                    pygame.quit()
+                    call(["python", "main.py"]) 
+                    
                     return  # Exit the message function and continue the game loop
 
 def main():
